@@ -5,3 +5,7 @@ dist/
 .env
 .env.local
 *.log
+# 아이콘 소스/미리보기 (배포에 미사용, 재생성용 로컬 파일)
+icon.PNG
+icon.png
+icon-cleaned.png
