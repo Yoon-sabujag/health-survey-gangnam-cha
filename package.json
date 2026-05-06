@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "mkdir -p dist && cp src/index.js dist/_worker.js",
+    "build": "node build.js",
     "deploy": "npm run build && wrangler pages deploy dist --project-name=health-survey-gangnam-cha --branch=main",
     "dev": "npm run build && wrangler pages dev dist"
   },

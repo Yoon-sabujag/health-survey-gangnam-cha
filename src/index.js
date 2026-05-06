@@ -1,5 +1,66 @@
 // 강남차 여성병원 건강강좌 만족도 조사 시스템
 
+import { ICON_192, ICON_512, ICON_180 } from './icons.js';
+
+// ============================================================================
+// PWA: 매니페스트 + 아이콘
+// ============================================================================
+
+const APP_NAME = "강남차 건강강좌 설문 관리";
+const APP_SHORT_NAME = "설문 관리";
+const APP_THEME_COLOR = "#7c2a5e";
+
+const MANIFEST = {
+  name: APP_NAME,
+  short_name: APP_SHORT_NAME,
+  description: "강남차 여성병원 건강강좌 만족도 조사 관리자 대시보드",
+  start_url: "/admin",
+  scope: "/",
+  display: "standalone",
+  orientation: "any",
+  background_color: "#ffffff",
+  theme_color: APP_THEME_COLOR,
+  lang: "ko-KR",
+  icons: [
+    { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+    { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+  ],
+};
+
+function b64ToBytes(b64) {
+  const bin = atob(b64);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+function pngResponse(b64) {
+  return new Response(b64ToBytes(b64), {
+    headers: {
+      "Content-Type": "image/png",
+      "Cache-Control": "public, max-age=86400",
+    },
+  });
+}
+
+function manifestResponse() {
+  return new Response(JSON.stringify(MANIFEST), {
+    headers: {
+      "Content-Type": "application/manifest+json; charset=utf-8",
+      "Cache-Control": "public, max-age=3600",
+    },
+  });
+}
+
+const PWA_HEAD_TAGS = `<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-180.png">
+<meta name="theme-color" content="${APP_THEME_COLOR}">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="${APP_SHORT_NAME}">`;
+
 // ============================================================================
 // 유틸리티
 // ============================================================================
@@ -529,6 +590,7 @@ const SURVEY_HTML = `<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>강남차 여성병원 건강강좌 만족도 조사</title>
+${PWA_HEAD_TAGS}
 <style>
   :root {
     --p: #7c2a5e;
@@ -1059,6 +1121,7 @@ const QR_HTML = `<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>건강강좌 만족도 조사 — QR 안내</title>
+${PWA_HEAD_TAGS}
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 <style>
   * { box-sizing: border-box; }
@@ -1175,6 +1238,7 @@ const ADMIN_HTML = `<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>건강강좌 설문 관리자</title>
+${PWA_HEAD_TAGS}
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
@@ -1185,10 +1249,28 @@ const ADMIN_HTML = `<!doctype html>
   .wrap{max-width:1200px;margin:0 auto;padding:20px}
   header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--bd)}
   header h1{margin:0;font-size:20px;color:var(--p)}
-  .login{max-width:400px;margin:80px auto;padding:32px;background:#fff;border:1px solid var(--bd);border-radius:12px}
+  .login-wrap{max-width:520px;margin:40px auto;padding:0 16px}
+  .login{padding:32px;background:#fff;border:1px solid var(--bd);border-radius:12px}
   .login h2{margin:0 0 20px;color:var(--p);text-align:center}
   .login input{width:100%;padding:12px;border:1.5px solid var(--bd);border-radius:8px;font-size:15px;margin-bottom:12px}
   .login button{width:100%;padding:12px;border:0;background:var(--p);color:#fff;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer}
+  /* PWA 설치 안내 */
+  .install-card{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:18px;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  .install-card .head{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+  .install-card .head .icon{font-size:32px;line-height:1}
+  .install-card .head .ttl{font-weight:700;color:var(--p);font-size:15px;margin-bottom:3px}
+  .install-card .head .desc{color:#666;font-size:13px;line-height:1.5}
+  .install-card .close{margin-left:auto;background:none;border:0;color:#aaa;font-size:20px;cursor:pointer;padding:0 4px;width:auto;font-weight:300}
+  .install-tabs{display:flex;gap:0;border-bottom:1px solid var(--bd);margin-bottom:12px}
+  .install-tab{flex:1;padding:8px 4px;border:0;background:none;cursor:pointer;color:#888;font-size:13px;border-bottom:2px solid transparent;font-weight:500;width:auto}
+  .install-tab.active{color:var(--p);border-bottom-color:var(--p);font-weight:600}
+  .install-content{font-size:13px;line-height:1.7;color:#333}
+  .install-content ol{padding-left:20px;margin:8px 0}
+  .install-content li{margin-bottom:6px}
+  .install-content b{color:var(--p)}
+  .install-content .note{margin-top:10px;padding:8px 12px;background:#fdf3f8;border-radius:6px;color:#666;font-size:12px;line-height:1.6}
+  .install-btn{display:inline-block;width:auto;margin-top:8px;padding:10px 18px;border:0;background:var(--p);color:#fff;border-radius:6px;font-weight:600;font-size:14px;cursor:pointer}
+  .install-btn:disabled{background:#bbb;cursor:not-allowed}
   .tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--bd)}
   .tab{padding:10px 16px;border:0;background:none;cursor:pointer;font-size:14px;font-weight:500;color:var(--mu);border-bottom:2px solid transparent}
   .tab.active{color:var(--p);border-bottom-color:var(--p)}
@@ -1242,6 +1324,8 @@ const ADMIN_HTML = `<!doctype html>
 const S = {
   pwd: localStorage.getItem('admin_pwd') || '',
   authed: false,
+  installDismissed: localStorage.getItem('install_dismissed') === '1',
+  installTab: null,
   tab: 'monthly',
   year: new Date().getFullYear(),
   month: new Date().getMonth() + 1,
@@ -1721,13 +1805,95 @@ function buildCommentsSheet(wb, d) {
   ws.views = [{ state: 'frozen', ySplit: 1 }];
 }
 
+// ===== PWA 설치 안내 =====
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredInstallPrompt = e; if (!S.authed) render(); });
+window.addEventListener('appinstalled', () => { deferredInstallPrompt = null; localStorage.setItem('pwa_installed','1'); if (!S.authed) render(); });
+
+function detectPlatform() {
+  const ua = navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+  const isAndroid = /Android/.test(ua);
+  if (isIOS) return 'ios';
+  if (isAndroid) return 'android';
+  return 'desktop';
+}
+function isStandalonePWA() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+window.setInstallTab = (t) => { S.installTab = t; render(); };
+window.dismissInstall = () => { localStorage.setItem('install_dismissed','1'); S.installDismissed = true; render(); };
+window.triggerInstall = async () => {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  const { outcome } = await deferredInstallPrompt.userChoice;
+  if (outcome === 'accepted') deferredInstallPrompt = null;
+  render();
+};
+
+function renderInstallCard() {
+  if (isStandalonePWA() || localStorage.getItem('pwa_installed') === '1' || S.installDismissed) return '';
+  const platform = S.installTab || detectPlatform();
+  const tab = (k, l) => '<button class="install-tab'+(platform===k?' active':'')+'" onclick="setInstallTab(\\''+k+'\\')">'+l+'</button>';
+  const canInstall = !!deferredInstallPrompt;
+
+  let content = '';
+  if (platform === 'android') {
+    content = '<ol>'+
+      '<li><b>Chrome 브라우저</b>로 이 페이지를 열어주세요</li>'+
+      '<li>아래 <b>[설치하기]</b> 버튼을 누르세요'+(canInstall?'':' (버튼이 없으면 화면 우측 상단의 <b>⋮</b> 메뉴 → <b>"홈 화면에 추가"</b> 또는 <b>"앱 설치"</b>를 누르세요)')+'</li>'+
+      '<li><b>[설치]</b> 또는 <b>[추가]</b>를 누르면 끝!</li>'+
+      '<li>스마트폰 홈 화면에서 <b>'+APP_SHORT_NAME+'</b> 아이콘을 찾아 누르면 바로 들어옵니다</li>'+
+      '</ol>'+
+      (canInstall ? '<button class="install-btn" onclick="triggerInstall()">📥 설치하기</button>' : '<div class="note">설치 버튼이 안 보이면 우측 상단 <b>⋮</b> 메뉴를 직접 눌러주세요.</div>');
+  } else if (platform === 'ios') {
+    content = '<ol>'+
+      '<li><b>Safari 브라우저</b>로 이 페이지를 열어주세요 <span style="color:#c33">(중요: Chrome·삼성 브라우저는 안 됩니다)</span></li>'+
+      '<li>화면 <b>아래 가운데</b>에 있는 <b>공유 버튼</b>을 누르세요 (네모 + 위 화살표 ⬆️ 모양)</li>'+
+      '<li>메뉴를 <b>아래로 살짝 스크롤</b> 하면 <b>"홈 화면에 추가"</b>가 보입니다 — 그것을 누르세요</li>'+
+      '<li>오른쪽 위의 <b>[추가]</b>를 누르면 끝!</li>'+
+      '<li>아이폰 홈 화면에 <b>'+APP_SHORT_NAME+'</b> 아이콘이 생긴 것을 확인하세요</li>'+
+      '</ol>'+
+      '<div class="note">아이폰은 자동 설치 버튼이 없어요. 위 순서대로 직접 추가하셔야 합니다.</div>';
+  } else {
+    content = '<ol>'+
+      '<li><b>Chrome 또는 Edge 브라우저</b>로 이 페이지를 열어주세요</li>'+
+      '<li>아래 <b>[설치하기]</b> 버튼을 누르세요'+(canInstall?'':' (버튼이 없으면 주소창 오른쪽 끝의 <b>모니터+화살표 아이콘 (⊕)</b>을 눌러주세요)')+'</li>'+
+      '<li>"<b>'+APP_NAME+' 설치</b>" 라는 창이 뜨면 <b>[설치]</b>를 누르세요</li>'+
+      '<li>독립된 창이 열리고, 작업표시줄·바탕화면에 아이콘이 생깁니다 — 다음부터는 그 아이콘으로 바로 들어오세요</li>'+
+      '</ol>'+
+      (canInstall ? '<button class="install-btn" onclick="triggerInstall()">💻 설치하기</button>' : '<div class="note">설치 버튼이 안 보이면 주소창 오른쪽 끝 작은 모니터 모양 아이콘을 눌러주세요. 못 찾겠으면 <b>⋮</b> 메뉴 → "<b>'+APP_NAME+' 설치</b>"를 클릭.</div>');
+  }
+
+  return '<div class="install-card">'+
+    '<div class="head">'+
+      '<div class="icon">📱</div>'+
+      '<div style="flex:1">'+
+        '<div class="ttl">홈 화면에 설치해서 앱처럼 사용하세요</div>'+
+        '<div class="desc">한 번 설치하면 매번 주소를 입력하지 않아도 됩니다. 사용 중인 기기를 선택해주세요.</div>'+
+      '</div>'+
+      '<button class="close" onclick="dismissInstall()" title="닫기">×</button>'+
+    '</div>'+
+    '<div class="install-tabs">'+
+      tab('android','📱 안드로이드')+
+      tab('ios','🍎 아이폰')+
+      tab('desktop','💻 데스크톱')+
+    '</div>'+
+    '<div class="install-content">'+content+'</div>'+
+    '</div>';
+}
+
 // ===== 렌더 =====
 function render() {
   const root = document.getElementById('root');
   if (!S.authed) {
-    root.innerHTML = '<div class="login"><h2>관리자 로그인</h2>'+
+    root.innerHTML = '<div class="login-wrap">'+
+      renderInstallCard()+
+      '<div class="login"><h2>관리자 로그인</h2>'+
       '<input id="pwd-input" type="password" placeholder="관리자 비밀번호" onkeypress="if(event.key===\\'Enter\\')tryLogin()">'+
-      '<button onclick="tryLogin()">로그인</button></div>';
+      '<button onclick="tryLogin()">로그인</button></div>'+
+      '</div>';
     setTimeout(() => { const i = document.getElementById('pwd-input'); if (i) i.focus(); }, 0);
     return;
   }
@@ -2532,6 +2698,12 @@ export default {
     }
 
     try {
+      // PWA 자산
+      if (path === "/manifest.webmanifest") return manifestResponse();
+      if (path === "/icon-192.png") return pngResponse(ICON_192);
+      if (path === "/icon-512.png") return pngResponse(ICON_512);
+      if (path === "/icon-180.png") return pngResponse(ICON_180);
+
       // 페이지
       if (path === "/" || path === "/survey") return html(SURVEY_HTML);
       if (path === "/admin" || path === "/admin/") return html(ADMIN_HTML);
