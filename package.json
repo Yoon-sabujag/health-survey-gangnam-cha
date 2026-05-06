@@ -1,0 +1,14 @@
+{
+  "name": "health-survey",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "mkdir -p dist && cp src/index.js dist/_worker.js",
+    "deploy": "npm run build && wrangler pages deploy dist --project-name=health-survey-gangnam-cha --branch=main",
+    "dev": "npm run build && wrangler pages dev dist"
+  },
+  "devDependencies": {
+    "wrangler": "^4.88.0"
+  }
+}

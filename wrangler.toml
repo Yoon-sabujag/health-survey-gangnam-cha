@@ -1,0 +1,11 @@
+name = "health-survey-gangnam-cha"
+compatibility_date = "2026-05-01"
+pages_build_output_dir = "./dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "health-survey-db"
+database_id = "60192d6c-addb-401b-8d85-17a81df6a44d"
+
+[vars]
+HOSPITAL_NAME = "강남차 여성병원"
