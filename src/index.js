@@ -1844,7 +1844,7 @@ function renderInstallCard() {
       '<li><b>Chrome 브라우저</b>로 이 페이지를 열어주세요</li>'+
       '<li>아래 <b>[설치하기]</b> 버튼을 누르세요'+(canInstall?'':' (버튼이 없으면 화면 우측 상단의 <b>⋮</b> 메뉴 → <b>"홈 화면에 추가"</b> 또는 <b>"앱 설치"</b>를 누르세요)')+'</li>'+
       '<li><b>[설치]</b> 또는 <b>[추가]</b>를 누르면 끝!</li>'+
-      '<li>스마트폰 홈 화면에서 <b>'+APP_SHORT_NAME+'</b> 아이콘을 찾아 누르면 바로 들어옵니다</li>'+
+      '<li>스마트폰 홈 화면에서 <b>${APP_SHORT_NAME}</b> 아이콘을 찾아 누르면 바로 들어옵니다</li>'+
       '</ol>'+
       (canInstall ? '<button class="install-btn" onclick="triggerInstall()">📥 설치하기</button>' : '<div class="note">설치 버튼이 안 보이면 우측 상단 <b>⋮</b> 메뉴를 직접 눌러주세요.</div>');
   } else if (platform === 'ios') {
@@ -1853,17 +1853,17 @@ function renderInstallCard() {
       '<li>화면 <b>아래 가운데</b>에 있는 <b>공유 버튼</b>을 누르세요 (네모 + 위 화살표 ⬆️ 모양)</li>'+
       '<li>메뉴를 <b>아래로 살짝 스크롤</b> 하면 <b>"홈 화면에 추가"</b>가 보입니다 — 그것을 누르세요</li>'+
       '<li>오른쪽 위의 <b>[추가]</b>를 누르면 끝!</li>'+
-      '<li>아이폰 홈 화면에 <b>'+APP_SHORT_NAME+'</b> 아이콘이 생긴 것을 확인하세요</li>'+
+      '<li>아이폰 홈 화면에 <b>${APP_SHORT_NAME}</b> 아이콘이 생긴 것을 확인하세요</li>'+
       '</ol>'+
       '<div class="note">아이폰은 자동 설치 버튼이 없어요. 위 순서대로 직접 추가하셔야 합니다.</div>';
   } else {
     content = '<ol>'+
       '<li><b>Chrome 또는 Edge 브라우저</b>로 이 페이지를 열어주세요</li>'+
       '<li>아래 <b>[설치하기]</b> 버튼을 누르세요'+(canInstall?'':' (버튼이 없으면 주소창 오른쪽 끝의 <b>모니터+화살표 아이콘 (⊕)</b>을 눌러주세요)')+'</li>'+
-      '<li>"<b>'+APP_NAME+' 설치</b>" 라는 창이 뜨면 <b>[설치]</b>를 누르세요</li>'+
+      '<li>"<b>${APP_NAME} 설치</b>" 라는 창이 뜨면 <b>[설치]</b>를 누르세요</li>'+
       '<li>독립된 창이 열리고, 작업표시줄·바탕화면에 아이콘이 생깁니다 — 다음부터는 그 아이콘으로 바로 들어오세요</li>'+
       '</ol>'+
-      (canInstall ? '<button class="install-btn" onclick="triggerInstall()">💻 설치하기</button>' : '<div class="note">설치 버튼이 안 보이면 주소창 오른쪽 끝 작은 모니터 모양 아이콘을 눌러주세요. 못 찾겠으면 <b>⋮</b> 메뉴 → "<b>'+APP_NAME+' 설치</b>"를 클릭.</div>');
+      (canInstall ? '<button class="install-btn" onclick="triggerInstall()">💻 설치하기</button>' : '<div class="note">설치 버튼이 안 보이면 주소창 오른쪽 끝 작은 모니터 모양 아이콘을 눌러주세요. 못 찾겠으면 <b>⋮</b> 메뉴 → "<b>${APP_NAME} 설치</b>"를 클릭.</div>');
   }
 
   return '<div class="install-card">'+
