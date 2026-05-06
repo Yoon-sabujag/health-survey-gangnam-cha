@@ -1,9 +1,7 @@
 // 강남차 여성병원 건강강좌 만족도 조사 시스템
 
-import { ICON_192, ICON_512, ICON_180 } from './icons.js';
-
 // ============================================================================
-// PWA: 매니페스트 + 아이콘
+// PWA: 매니페스트 + 아이콘 (아이콘 PNG는 dist/ 정적 파일로 직접 서빙)
 // ============================================================================
 
 const APP_NAME = "강남차 건강강좌 설문 관리";
@@ -26,22 +24,6 @@ const MANIFEST = {
     { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
   ],
 };
-
-function b64ToBytes(b64) {
-  const bin = atob(b64);
-  const out = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
-  return out;
-}
-
-function pngResponse(b64) {
-  return new Response(b64ToBytes(b64), {
-    headers: {
-      "Content-Type": "image/png",
-      "Cache-Control": "public, max-age=86400",
-    },
-  });
-}
 
 function manifestResponse() {
   return new Response(JSON.stringify(MANIFEST), {
@@ -2700,9 +2682,10 @@ export default {
     try {
       // PWA 자산
       if (path === "/manifest.webmanifest") return manifestResponse();
-      if (path === "/icon-192.png") return pngResponse(ICON_192);
-      if (path === "/icon-512.png") return pngResponse(ICON_512);
-      if (path === "/icon-180.png") return pngResponse(ICON_180);
+      // 아이콘 PNG는 dist/ 정적 파일로 직접 서빙 (env.ASSETS 사용)
+      if (/^\/icon-(\d+)\.png$/.test(path) && env.ASSETS) {
+        return env.ASSETS.fetch(request);
+      }
 
       // 페이지
       if (path === "/" || path === "/survey") return html(SURVEY_HTML);

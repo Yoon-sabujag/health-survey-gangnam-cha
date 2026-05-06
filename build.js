@@ -1,14 +1,22 @@
-// 단일 _worker.js로 번들링: src/icons.js + src/index.js
+// dist/_worker.js + dist/<assets> 빌드
 import fs from 'node:fs';
+import path from 'node:path';
 
 const main = fs.readFileSync('src/index.js', 'utf8');
-const icons = fs.existsSync('src/icons.js') ? fs.readFileSync('src/icons.js', 'utf8') : '';
-
-// icons.js의 export 제거 (단순 const로)
-const iconsStripped = icons.replace(/^export\s+/gm, '');
-// index.js에서 ./icons.js import 제거
-const mainStripped = main.replace(/^import\s+\{[^}]+\}\s+from\s+['"]\.\/icons\.js['"];?\s*$\n?/gm, '');
-
 fs.mkdirSync('dist', { recursive: true });
-fs.writeFileSync('dist/_worker.js', iconsStripped + '\n' + mainStripped);
+
+// (구버전) icons.js import 라인이 남아있으면 제거
+const stripped = main.replace(/^import\s+\{[^}]+\}\s+from\s+['"]\.\/icons\.js['"];?\s*\n?/gm, '');
+fs.writeFileSync('dist/_worker.js', stripped);
 console.log('✓ dist/_worker.js (' + Math.round(fs.statSync('dist/_worker.js').size / 1024) + ' KB)');
+
+// assets/* → dist/
+const assetsDir = 'assets';
+if (fs.existsSync(assetsDir)) {
+  for (const f of fs.readdirSync(assetsDir)) {
+    const src = path.join(assetsDir, f);
+    const dst = path.join('dist', f);
+    fs.copyFileSync(src, dst);
+    console.log(`✓ dist/${f} (${Math.round(fs.statSync(dst).size / 1024)} KB)`);
+  }
+}
