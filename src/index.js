@@ -2167,7 +2167,24 @@ function initCharts(d) {
   if (typeof ChartDataLabels !== 'undefined') Chart.register(ChartDataLabels);
   Chart.register(SmallSliceLabelsPlugin);
   const QS = ['q5_time','q6_explain','q7_curiosity','q8_satisfaction','q9_facility'];
-  const Q_LABELS_SHORT = (Q5_9_TITLES || []).map((t, i) => 'Q' + (5 + i) + ' ' + (t || '').replace(/[?!.]+$/, '').slice(0, 10));
+  const wrapLabel = (text, maxLen) => {
+    const cleaned = (text || '').replace(/[?!.]+$/, '').trim();
+    if (cleaned.length <= maxLen) return [cleaned];
+    const words = cleaned.split(' ');
+    const lines = [];
+    let cur = '';
+    for (const w of words) {
+      const combined = cur ? cur + ' ' + w : w;
+      if (combined.length > maxLen && cur) { lines.push(cur); cur = w; }
+      else cur = combined;
+    }
+    if (cur) lines.push(cur);
+    return lines;
+  };
+  const Q_LABELS_SHORT = (Q5_9_TITLES || []).map((t, i) => {
+    const lines = wrapLabel(t, 12);
+    return ['Q' + (5 + i) + ' ' + lines[0]].concat(lines.slice(1));
+  });
   Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", sans-serif';
   Chart.defaults.font.size = 12;
   Chart.defaults.plugins.datalabels = { color: '#fff', font: { weight: '700', size: 11 } };
@@ -2388,13 +2405,18 @@ function renderMatrix(d) {
     { k:'q9_facility', t:'9. 장소·시설' },
   ];
   const scaleLabels = [{s:5,l:'매우 그렇다'},{s:4,l:'그렇다'},{s:3,l:'보통'}];
-  let h = '<div class="card"><h3>📊 문항별 점수 분포 (강좌별)</h3><div style="overflow-x:auto"><table>';
+  const minW = 362 + lectures.length * 86;
+  let h = '<div class="card"><h3>📊 문항별 점수 분포 (강좌별)</h3><div style="overflow-x:auto"><table style="table-layout:fixed;width:100%;min-width:'+minW+'px">';
+  // 컬럼 폭 — 문항/응답/합계/점수합은 고정, 강좌별이 남은 공간 균등 분배
+  h += '<colgroup><col style="width:150px"><col style="width:96px">';
+  for (let i = 0; i < lectures.length; i++) h += '<col>';
+  h += '<col style="width:54px"><col style="width:62px"></colgroup>';
   // 헤더
-  h += '<tr><th rowspan="2">문항</th><th rowspan="2">응답</th>';
+  h += '<tr><th rowspan="2" style="white-space:nowrap">문항</th><th rowspan="2" style="white-space:nowrap">응답</th>';
   for (const l of lectures) h += '<th>'+escHtml(l.symbol)+'</th>';
   h += '<th rowspan="2">합계</th><th rowspan="2">점수합</th></tr>';
   h += '<tr>';
-  for (const l of lectures) h += '<th class="small" style="font-weight:400;font-size:10px">'+escHtml(l.name.slice(0,5))+'</th>';
+  for (const l of lectures) h += '<th class="small" style="font-weight:400;font-size:10px;white-space:normal;word-break:keep-all">'+escHtml(l.name)+'</th>';
   h += '</tr>';
   for (const Q of QS) {
     const M = d.matrix[Q.k];
